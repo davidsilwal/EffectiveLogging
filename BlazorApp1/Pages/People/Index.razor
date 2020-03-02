@@ -1,0 +1,46 @@
+﻿@using BlazorApp1.Data
+@inject IPersonService personService
+
+@page "/people"
+<h3>People</h3>
+
+<a href="/people/add" class="btn btn-primary">Add People</a>
+
+
+@if (people == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var people in people)
+            {
+                <tr>
+                    <td>@people.Id</td>
+                    <td>@people.Name</td>
+                    <td><a href="/people/edit/@people.Id" class="btn btn-success btn-sm">Edit</a> </td>
+                    <td><button class="btn btn-warning btn-sm" @onclick ="@(async ()=> { await personService.Delete(people.Id); })">Delete</button> </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code{
+    List<Person> people = new List<Person>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        people = await personService.FindAll();
+    }
+}

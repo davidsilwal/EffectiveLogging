@@ -1,0 +1,61 @@
+version: '3.4'
+
+services:
+  webapplication.api:
+    image: webapplicationapi
+    build:
+      context: .
+      dockerfile: WebApplication.API/Dockerfile
+    ports:
+     - "8005:80"     
+    networks:
+      logmetric:
+
+  blazorapp1:
+    image: blazorapp1
+    build:
+      context: .
+      dockerfile: BlazorApp1/Dockerfile
+    ports:
+     - "8004:80"
+    networks:
+      logmetric:
+
+  zipkin:
+    image: "openzipkin/zipkin"
+    ports:
+      - "9411:9411"
+    networks:
+      logmetric:   
+
+  seq:
+    image: "datalust/seq"
+    ports:
+      - "8080:80"
+      - "5311:5341" 
+    environment:
+      - ACCEPT_EULA=Y
+    networks:
+      logmetric:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+    ports:
+      - 9200:9200
+    environment:
+      discovery.type: single-node
+      cluster.routing.allocation.disk.threshold_enabled: "false"
+    networks:
+      logmetric:
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.3.0
+    ports:
+      - 5601:5601
+    networks:
+      logmetric:
+
+networks:
+ logmetric:
+   driver: 'bridge'  
+ 

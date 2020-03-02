@@ -1,0 +1,34 @@
+﻿@using BlazorApp1.Data
+@inject IPersonService personService
+@inject NavigationManager navigationManager
+
+
+@page "/people/add"
+
+<h3>Add</h3>
+
+<EditForm Model="@person" OnValidSubmit="@(async ()=> await AddPerson())">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name: </label>
+        <InputText Class="form-control" @bind-Value="@person.Name" />
+        <ValidationMessage For="@(() => person.Name)" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Add</button>
+
+</EditForm>
+
+@code {
+
+    public Person person { get; set; } = new Person();
+
+    async Task AddPerson()
+    {
+        await personService.Add(person);
+        navigationManager.NavigateTo("/people");
+    }
+
+}

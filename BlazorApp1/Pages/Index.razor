@@ -1,0 +1,51 @@
+﻿@*@using BlazorApp1.Data
+@using System.Net.Http
+@using  System.Text.Json
+@inject HttpClient Http*@
+
+@page "/"
+
+
+@*@if(People == null)
+{
+    <p><em>Loading..</em></p>
+}else{
+
+    <table>
+        <thead>
+            <tr>
+                <td>Id</td>
+                <td>Name</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var person in People)
+            {
+                <tr>
+                    <rtd>@person.Id</rtd>
+                    <rtd>@person.Name</rtd>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+
+
+@code{
+    List<Person> People = new List<Person>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        People = await GetPeopleAsync();
+    }
+
+    public async Task<List<Person>> GetPeopleAsync()
+    {
+        var response = await Http.GetAsync("api/contacts");
+        response.EnsureSuccessStatusCode();
+
+        using var responseContent = await response.Content.ReadAsStreamAsync();
+        return await JsonSerializer.DeserializeAsync<List<Person>>(responseContent);
+    }
+}*@

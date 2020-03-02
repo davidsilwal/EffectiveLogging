@@ -1,0 +1,49 @@
+﻿@using BlazorApp1.Data
+@inject IPersonService personService
+@inject NavigationManager navigationManager
+
+@page "/people/edit/{personId:int}"
+
+<h3>Add</h3>
+
+<EditForm Model="@person" OnValidSubmit="@(async ()=> await EditPerson())">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name: </label>
+        <InputText Class="form-control" @bind-Value="@person.Name" />
+        <ValidationMessage For="@(() => person.Name)" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Add</button>
+
+</EditForm>
+
+@code {
+
+    public Person person { get; set; }
+
+    [Parameter]
+
+    public int? PersonId { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+
+        if (PersonId.HasValue)
+        {
+            person = await personService.Get(PersonId.Value);
+        }
+    }
+
+
+    async Task EditPerson()
+    {
+       await  personService.Edit(person);
+
+        navigationManager.NavigateTo("/people");
+
+    }
+
+}
