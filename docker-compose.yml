@@ -32,7 +32,7 @@ services:
     image: "datalust/seq"
     ports:
       - "8080:80"
-      - "5311:5341" 
+      - "5341:5341" 
     environment:
       - ACCEPT_EULA=Y
     networks:

@@ -37,8 +37,7 @@ namespace WebApplication.API
 
             services.AddDbContextPool<ApplicationDbContext>(options => options
                     .UseLoggerFactory(MyLoggerFactory)
-                    .UseSqlServer("Server=.;Database=Logging;Trusted_Connection=True;"));
-
+                    .UseInMemoryDatabase("testdb"));
 
             services.AddOpenTelemetry(builder =>
             {
