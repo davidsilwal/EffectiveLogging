@@ -62,12 +62,12 @@ namespace WebApplication.API
     }
     public class ApplicationDbContext : DbContext
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        //private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-      : base(options) {
-            _httpContextAccessor = this.GetService<IHttpContextAccessor>();
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
+            ) : base(options) {
+            //_httpContextAccessor = this.GetService<IHttpContextAccessor>();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
@@ -102,7 +102,7 @@ namespace WebApplication.API
 
                 var auditEntry = new AuditEntry(entry) {
                     TableName = entry.Metadata.GetDefaultTableName(),
-                    AuditBy = _httpContextAccessor.HttpContext.User.ToString(),
+                  //  AuditBy = _httpContextAccessor.HttpContext.User.ToString(),
                     EntityState = entry.State
                 };
                 //  auditEntry.TableName = entry.Metadata.Relational().TableName;

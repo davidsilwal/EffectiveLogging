@@ -53,7 +53,7 @@ namespace WebApplication.API.Controllers
         }
 
         // GET: api/People
-        [HttpGet]
+        [HttpGet]       
         public async Task<ActionResult<IEnumerable<Person>>> GetPeople() {
             return await _context.People.ToListAsync();
         }

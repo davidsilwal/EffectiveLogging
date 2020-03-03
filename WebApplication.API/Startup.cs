@@ -36,8 +36,6 @@ namespace WebApplication.API
                     .EnableSensitiveDataLogging()
                     .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;");
 
-                options.UseInternalServiceProvider(provider);
-
             });
 
             //services.AddOpenTelemetry(builder => {
