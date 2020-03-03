@@ -1,6 +1,4 @@
-﻿using App.Metrics;
-using App.Metrics.Counter;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -18,36 +16,36 @@ namespace WebApplication.API.Controllers
 
 
         private readonly ILogger<PeopleController> _logger;
-        private readonly IMetrics _metrics;
+        //private readonly IMetrics _metrics;
 
-        private readonly CounterOptions _counterOptions = new CounterOptions {
-            MeasurementUnit = Unit.Calls,
-            Name = "Home Counter",
-            ResetOnReporting = true
-        };
+        //private readonly CounterOptions _counterOptions = new CounterOptions {
+        //    MeasurementUnit = Unit.Calls,
+        //    Name = "Home Counter",
+        //    ResetOnReporting = true
+        //};
 
         public PeopleController(ApplicationDbContext context,
-            ILogger<PeopleController> logger,
-            IMetrics metrics
+            ILogger<PeopleController> logger
+        //    IMetrics metrics
             ) {
             _context = context;
             _logger = logger;
-            _metrics = metrics;
+            //      _metrics = metrics;
         }
 
 
-        [HttpGet("increment")]
-        public IActionResult Increment(string tag = null) {
-            var tags = new MetricTags("userTag", string.IsNullOrEmpty(tag) ? "undefined" : tag);
-            _metrics.Measure.Counter.Increment(_counterOptions, tags);
-            return Ok("done");
-        }
+        //[HttpGet("increment")]
+        //public IActionResult Increment(string tag = null) {
+        //    var tags = new MetricTags("userTag", string.IsNullOrEmpty(tag) ? "undefined" : tag);
+        //    _metrics.Measure.Counter.Increment(_counterOptions, tags);
+        //    return Ok("done");
+        //}
 
         [HttpGet("exception")]
         public IActionResult Exception() {
             throw new ArgumentNullException();
         }
-        
+
         [HttpGet("regression")]
         public async Task<IActionResult> regression([FromQuery]int sec) {
             await Task.Delay(TimeSpan.FromSeconds(sec));

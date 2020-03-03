@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,17 +62,12 @@ namespace WebApplication.API
     }
     public class ApplicationDbContext : DbContext
     {
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-                     
+
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-      : base(options) { }
-
-        public ApplicationDbContext(ILoggerFactory loggerFactory,
-            IHttpContextAccessor httpContextAccessor) {
-            _loggerFactory = loggerFactory;
-            _httpContextAccessor = httpContextAccessor;
+      : base(options) {
+            _httpContextAccessor = this.GetService<IHttpContextAccessor>();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {

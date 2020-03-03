@@ -21,12 +21,12 @@ services:
  #   networks:
  #     logmetric:
 
-  zipkin:
-    image: "openzipkin/zipkin"
-    ports:
-      - "9411:9411"
-    networks:
-      logmetric:   
+#  zipkin:
+#    image: "openzipkin/zipkin"
+#    ports:
+#      - "9411:9411"
+#    networks:
+#      logmetric:   
 
   seq:
     image: "datalust/seq"
@@ -56,22 +56,22 @@ services:
     networks:
       logmetric:
 
-  influxdb:
-    image: influxdb
-    ports:
-      - 8086:8086
-    networks:
-      logmetric:
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - 3000:3000
-    depends_on:
-    - influxdb
-    networks:
-      logmetric:
-
+#  influxdb:
+#    image: influxdb
+#    ports:
+#      - 8086:8086
+#    networks:
+#      logmetric:
+#
+#  grafana:
+#    image: grafana/grafana
+#    ports:
+#      - 3000:3000
+#    depends_on:
+#    - influxdb
+#    networks:
+#      logmetric:
+#
 networks:
  logmetric:
    driver: 'bridge'  
