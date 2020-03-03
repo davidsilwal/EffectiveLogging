@@ -16,7 +16,7 @@ namespace WebApplication.API
     {
         public static void Main(string[] args)
         {
-          //  Activity.DefaultIdFormat = ActivityIdFormat.W3C;
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
 
             CreateHostBuilder(args).Build().Run();
         }

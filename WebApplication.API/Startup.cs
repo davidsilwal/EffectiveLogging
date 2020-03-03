@@ -1,3 +1,4 @@
+using App.Metrics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +14,14 @@ namespace WebApplication.API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
+        public Startup(IConfiguration configuration) {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
         public static readonly ILoggerFactory MyLoggerFactory
-                    = LoggerFactory.Create(builder =>
-                    {
+                    = LoggerFactory.Create(builder => {
                         builder
                             .AddFilter((category, level) =>
                                 category == DbLoggerCategory.Database.Command.Name
@@ -31,18 +30,20 @@ namespace WebApplication.API
                     });
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
+        public void ConfigureServices(IServiceCollection services) {
 
+
+            //services.AddDbContextPool<ApplicationDbContext>(options => options
+            //        .UseLoggerFactory(MyLoggerFactory)
+            //        .UseInMemoryDatabase("testdb"));
 
             services.AddDbContextPool<ApplicationDbContext>(options => options
                     .UseLoggerFactory(MyLoggerFactory)
-                    .UseInMemoryDatabase("testdb"));
+                    .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;"));
+            
 
-            services.AddOpenTelemetry(builder =>
-            {
-                builder.UseZipkin(o =>
-                {
+            services.AddOpenTelemetry(builder => {
+                builder.UseZipkin(o => {
                     o.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
                     o.ServiceName = typeof(Startup).Assembly.GetName().Name;
                 });
@@ -51,35 +52,33 @@ namespace WebApplication.API
                        .AddDependencyCollector();
             });
 
-            //   var metrics = AppMetrics.CreateDefaultBuilder()
-            //    .Report.ToInfluxDb(options =>
-            //    {
-            //        options.InfluxDb.BaseUri = new Uri("http://127.0.0.1:8086");
-            //        options.InfluxDb.Database = "my-metrics";
-            //        options.InfluxDb.CreateDataBaseIfNotExists = true;
-            //    })
-            //    .Build();
+            var metrics = AppMetrics.CreateDefaultBuilder()
+             .Report.ToInfluxDb(options => {
+                 options.InfluxDb.BaseUri = new Uri("https://us-west-2-1.aws.cloud2.influxdata.com/orgs/36952df9cf26d4b0");
+                 options.InfluxDb.UserName = "de.davidsilwal@gmail.com";
+                 options.InfluxDb.Password = "_e*S2ba^y6wUtm%=";
+                 options.InfluxDb.Database = "my-metrics";
+                 options.InfluxDb.CreateDataBaseIfNotExists = true;
+             })
+             .Build();
 
-            //     services.AddMetrics(metrics);
-            //     services.AddMetricsTrackingMiddleware();
-            //     services.AddMetricsReportingHostedService();
-            //     services.AddHoneycomb(Configuration);
+            services.AddMetrics(metrics);
+            services.AddMetricsTrackingMiddleware();
+            services.AddMetricsReportingHostedService();
+        //    services.AddHoneycomb(Configuration);
 
 
-            services.AddControllers(opts =>
-            {
+            services.AddControllers(opts => {
                 opts.Filters.Add<SerilogLoggingActionFilter>();
             });//.AddMetrics();
             // Register the Swagger generator, defining 1 or more Swagger documents
-            var serviceCollection = services.AddSwaggerGen(c =>
-            {
+            var serviceCollection = services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
             app.UseApiExceptionHandler();
 
             app.UseStaticFiles();
@@ -91,19 +90,16 @@ namespace WebApplication.API
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
+            app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
-            //app.UseMetricsAllMiddleware();
+            app.UseMetricsAllMiddleware();
             //app.UseHoneycomb();
 
             app.UseRouting();
-
-
-            app.UseEndpoints(endpoints =>
-            {
+            
+            app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
 
