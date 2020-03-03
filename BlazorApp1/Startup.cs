@@ -25,7 +25,7 @@ namespace BlazorApp1
         {
             services.AddOpenTelemetry(builder =>
             {
-                builder.UseZipkin(o =>
+                builder.UseZipkin(o =>  
                 {
                     o.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
                     o.ServiceName = typeof(Startup).Assembly.GetName().Name;

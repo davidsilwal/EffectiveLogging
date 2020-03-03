@@ -39,7 +39,7 @@ services:
       logmetric:
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
     ports:
       - 9200:9200
    # volumes:
@@ -48,7 +48,7 @@ services:
       logmetric:
   
   kibana:
-    image: docker.elastic.co/kibana/kibana:6.3.0
+    image: docker.elastic.co/kibana/kibana:7.6.0
     ports:
       - 5601:5601
     depends_on:
@@ -56,19 +56,19 @@ services:
     networks:
       logmetric:
 
-#  influxdb:
-#    image: influxdb
-#    ports:
-#      - 8086:8086
-#    networks:
-#      logmetric:
-#
+  influxdb:
+    image: influxdb
+    ports:
+      - 8086:8086
+    networks:
+      logmetric:
+
   grafana:
     image: grafana/grafana
     ports:
       - 3000:3000
- #   depends_on:
- #   - influxdb
+    depends_on:
+    - influxdb
     networks:
       logmetric:
 

@@ -20,14 +20,6 @@ namespace WebApplication.API
 
         public IConfiguration Configuration { get; }
 
-        public static readonly ILoggerFactory MyLoggerFactory
-                    = LoggerFactory.Create(builder => {
-                        builder
-                            .AddFilter((category, level) =>
-                                category == DbLoggerCategory.Database.Command.Name
-                                && level == LogLevel.Information)
-                            .AddConsole();
-                    });
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
@@ -37,10 +29,24 @@ namespace WebApplication.API
             //        .UseLoggerFactory(MyLoggerFactory)
             //        .UseInMemoryDatabase("testdb"));
 
-            services.AddDbContextPool<ApplicationDbContext>(options => options
-                    .UseLoggerFactory(MyLoggerFactory)
-                    .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;"));
-            
+
+            services.AddDbContextPool<ApplicationDbContext>(options=>{
+             
+                var scopeFactory = services
+                     .BuildServiceProvider()
+                     .GetRequiredService<IServiceScopeFactory>();
+
+                using var scope = scopeFactory.CreateScope();
+                var provider = scope.ServiceProvider;
+
+                var logger = provider.GetRequiredService<ILoggerFactory>();
+                
+                options
+                    .UseLoggerFactory(logger)
+                    .EnableDetailedErrors()
+                    .EnableSensitiveDataLogging()
+                    .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;");
+            });
 
             services.AddOpenTelemetry(builder => {
                 builder.UseZipkin(o => {
@@ -54,9 +60,7 @@ namespace WebApplication.API
 
             var metrics = AppMetrics.CreateDefaultBuilder()
              .Report.ToInfluxDb(options => {
-                 options.InfluxDb.BaseUri = new Uri("https://us-west-2-1.aws.cloud2.influxdata.com/orgs/36952df9cf26d4b0");
-                 options.InfluxDb.UserName = "de.davidsilwal@gmail.com";
-                 options.InfluxDb.Password = "_e*S2ba^y6wUtm%=";
+                 options.InfluxDb.BaseUri = new Uri("http://127.0.0.1:8086");
                  options.InfluxDb.Database = "my-metrics";
                  options.InfluxDb.CreateDataBaseIfNotExists = true;
              })
@@ -65,8 +69,7 @@ namespace WebApplication.API
             services.AddMetrics(metrics);
             services.AddMetricsTrackingMiddleware();
             services.AddMetricsReportingHostedService();
-        //    services.AddHoneycomb(Configuration);
-
+            //    services.AddHoneycomb(Configuration);
 
             services.AddControllers(opts => {
                 opts.Filters.Add<SerilogLoggingActionFilter>();
@@ -98,7 +101,7 @@ namespace WebApplication.API
             //app.UseHoneycomb();
 
             app.UseRouting();
-            
+
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });

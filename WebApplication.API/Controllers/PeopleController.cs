@@ -26,8 +26,7 @@ namespace WebApplication.API.Controllers
             ResetOnReporting = true
         };
 
-        public PeopleController(ApplicationDbContext context
-            ,
+        public PeopleController(ApplicationDbContext context,
             ILogger<PeopleController> logger,
             IMetrics metrics
             ) {
@@ -48,9 +47,8 @@ namespace WebApplication.API.Controllers
         public IActionResult Exception() {
             throw new ArgumentNullException();
         }
-
-
-        [HttpGet("regression/{sec}")]
+        
+        [HttpGet("regression")]
         public async Task<IActionResult> regression([FromQuery]int sec) {
             await Task.Delay(TimeSpan.FromSeconds(sec));
             return Ok();
