@@ -28,6 +28,7 @@ namespace WebApplication.API
                         AutoRegisterTemplate = true,
                         AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
                         CustomFormatter = new ElasticsearchJsonFormatter()
+                        
                     }))
 
                     //.UseSerilog((context, logging) =>

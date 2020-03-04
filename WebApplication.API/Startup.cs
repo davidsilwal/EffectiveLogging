@@ -1,3 +1,4 @@
+using Elastic.Apm.NetCoreAll;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -73,11 +74,14 @@ namespace WebApplication.API
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+
+            app.UseAllElasticApm(Configuration);
+
             app.UseApiExceptionHandler();
 
             app.UseStaticFiles();
 
-            app.UseSerilogRequestLogging();
+            app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -97,7 +101,9 @@ namespace WebApplication.API
                 endpoints.MapControllers();
             });
 
-            app.UseWelcomePage("/swagger");
+            //app.Run(async (context) => {
+            //    context.Response.Redirect("/swagger");
+            //});
         }
     }
 }
