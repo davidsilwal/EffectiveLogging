@@ -11,22 +11,12 @@ services:
 #    networks:
 #      logmetric:
 
- # blazorapp1:
- #   image: blazorapp1
- #   build:
- #     context: .
- #     dockerfile: BlazorApp1/Dockerfile
+ # zipkin:
+ #   image: "openzipkin/zipkin"
  #   ports:
- #    - "8004:80"
+ #     - "9411:9411"
  #   networks:
- #     logmetric:
-
-#  zipkin:
-#    image: "openzipkin/zipkin"
-#    ports:
-#      - "9411:9411"
-#    networks:
-#      logmetric:   
+ #     logmetric:   
 
   seq:
     image: "datalust/seq"

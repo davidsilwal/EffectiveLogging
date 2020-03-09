@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using OpenTelemetry;
+using OpenTelemetry.Trace.Configuration;
+using System;
 
 namespace WebApplication.API
 {
@@ -42,15 +45,17 @@ namespace WebApplication.API
 
             });
 
-            //services.AddOpenTelemetry(builder => {
-            //    builder.UseZipkin(o => {
-            //        o.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
-            //        o.ServiceName = typeof(Startup).Assembly.GetName().Name;
-            //    });
+            services.AddOpenTelemetry(builder =>
+            {
+                builder.UseZipkin(o =>
+                {
+                    o.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
+                    o.ServiceName = typeof(Startup).Assembly.GetName().Name;
+                });
 
-            //    builder.AddRequestCollector()
-            //           .AddDependencyCollector();
-            //});
+                builder.AddRequestCollector()
+                       .AddDependencyCollector();
+            });
 
             //var metrics = AppMetrics.CreateDefaultBuilder()
             // .Report.ToInfluxDb(options => {
