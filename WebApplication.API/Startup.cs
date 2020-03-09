@@ -9,6 +9,7 @@ using Serilog;
 using OpenTelemetry;
 using OpenTelemetry.Trace.Configuration;
 using System;
+using Elastic.Apm.NetCoreAll;
 
 namespace WebApplication.API
 {
@@ -45,17 +46,17 @@ namespace WebApplication.API
 
             });
 
-            services.AddOpenTelemetry(builder =>
-            {
-                builder.UseZipkin(o =>
-                {
-                    o.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
-                    o.ServiceName = typeof(Startup).Assembly.GetName().Name;
-                });
+            //services.AddOpenTelemetry(builder =>
+            //{
+            //    builder.UseZipkin(o =>
+            //    {
+            //        o.Endpoint = new Uri("http://localhost:9411/api/v2/spans");
+            //        o.ServiceName = typeof(Startup).Assembly.GetName().Name;
+            //    });
 
-                builder.AddRequestCollector()
-                       .AddDependencyCollector();
-            });
+            //    builder.AddRequestCollector()
+            //           .AddDependencyCollector();
+            //});
 
             //var metrics = AppMetrics.CreateDefaultBuilder()
             // .Report.ToInfluxDb(options => {
@@ -70,6 +71,7 @@ namespace WebApplication.API
             //services.AddMetricsReportingHostedService();
             //    services.AddHoneycomb(Configuration);
 
+services.AddMetrics();
             services.AddControllers(opts =>
             {
                 opts.Filters.Add<SerilogLoggingActionFilter>();
@@ -90,6 +92,8 @@ namespace WebApplication.API
 
             app.UseStaticFiles();
 
+
+
          //   app.UseSerilogRequestLogging();
 
            app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
@@ -103,7 +107,9 @@ namespace WebApplication.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
-            //      app.UseMetricsAllMiddleware();
+            app.UseAllElasticApm(Configuration);
+
+            app.UseMetricsAllMiddleware();
             //app.UseHoneycomb();
 
             app.UseRouting();
