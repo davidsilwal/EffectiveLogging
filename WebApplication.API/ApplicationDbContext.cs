@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +17,14 @@ namespace WebApplication.API
         public string KeyValues { get; set; }
         public string OldValues { get; set; }
         public string NewValues { get; set; }
+        public string EntityState { get; set; }
+        public string AuditBy { get; set; }
     }
 
     public class AuditEntry
     {
-        public AuditEntry(EntityEntry entry) {
+        public AuditEntry(EntityEntry entry)
+        {
             Entry = entry;
         }
 
@@ -31,7 +32,7 @@ namespace WebApplication.API
         public string TableName { get; set; }
 
         public string AuditBy { get; set; }
-        public EntityState EntityState { get; set; }
+        public string EntityState { get; set; }
 
         public Dictionary<string, object> KeyValues { get; } = new Dictionary<string, object>();
         public Dictionary<string, object> OldValues { get; } = new Dictionary<string, object>();
@@ -40,13 +41,17 @@ namespace WebApplication.API
 
         public bool HasTemporaryProperties => TemporaryProperties.Any();
 
-        public Audit ToAudit() {
-            var audit = new Audit {
+        public Audit ToAudit()
+        {
+            var audit = new Audit
+            {
                 TableName = TableName,
                 DateTime = DateTime.UtcNow,
                 KeyValues = JsonSerializer.Serialize(KeyValues),
                 OldValues = OldValues.Count == 0 ? null : JsonSerializer.Serialize(OldValues),
-                NewValues = NewValues.Count == 0 ? null : JsonSerializer.Serialize(NewValues)
+                NewValues = NewValues.Count == 0 ? null : JsonSerializer.Serialize(NewValues),
+                AuditBy = AuditBy,
+                EntityState = EntityState
             };
             return audit;
         }
@@ -62,29 +67,26 @@ namespace WebApplication.API
     }
     public class ApplicationDbContext : DbContext
     {
-        //private readonly IHttpContextAccessor _httpContextAccessor;
-
-
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
-            ) : base(options) {
-            //_httpContextAccessor = this.GetService<IHttpContextAccessor>();
+            ) : base(options)
+        {
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
 
-            modelBuilder.Entity<AuditEntry>()
-                .Property(e => e.EntityState)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => (EntityState)Enum.Parse(typeof(EntityState), v));
-
-            base.OnModelCreating(modelBuilder);
+            // modelBuilder.Entity<AuditEntry>()
+            //     .Property(e => e.EntityState)
+            //     .HasConversion(
+            //         v => v.ToString(),
+            //         v => (EntityState)Enum.Parse(typeof(EntityState), v));
         }
 
         public DbSet<Person> People { get; set; }
         public DbSet<Audit> Audits { get; set; }
 
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken)) {
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        {
             var auditEntries = OnBeforeSaveChanges();
             var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
             await OnAfterSaveChanges(auditEntries);
@@ -92,7 +94,8 @@ namespace WebApplication.API
         }
 
 
-        private List<AuditEntry> OnBeforeSaveChanges() {
+        private List<AuditEntry> OnBeforeSaveChanges()
+        {
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
             foreach (var entry in ChangeTracker.Entries())
@@ -100,10 +103,11 @@ namespace WebApplication.API
                 if (entry.Entity is Audit || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
                     continue;
 
-                var auditEntry = new AuditEntry(entry) {
+                var auditEntry = new AuditEntry(entry)
+                {
                     TableName = entry.Metadata.GetDefaultTableName(),
-                  //  AuditBy = _httpContextAccessor.HttpContext.User.ToString(),
-                    EntityState = entry.State
+                    //  AuditBy = _httpContextAccessor.HttpContext.User.ToString(),
+                    EntityState = entry.State.ToString()
                 };
                 //  auditEntry.TableName = entry.Metadata.Relational().TableName;
                 auditEntries.Add(auditEntry);
@@ -155,7 +159,8 @@ namespace WebApplication.API
             return auditEntries.Where(_ => _.HasTemporaryProperties).ToList();
         }
 
-        private Task OnAfterSaveChanges(List<AuditEntry> auditEntries) {
+        private Task OnAfterSaveChanges(List<AuditEntry> auditEntries)
+        {
             if (auditEntries == null || auditEntries.Count == 0)
                 return Task.CompletedTask;
 

@@ -26,8 +26,14 @@ namespace WebApplication.API.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("AuditBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("EntityState")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("KeyValues")
                         .HasColumnType("nvarchar(max)");

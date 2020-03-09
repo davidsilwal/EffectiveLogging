@@ -10,7 +10,7 @@ using WebApplication.API;
 namespace WebApplication.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200302165922_initialSchema")]
+    [Migration("20200303144642_initialSchema")]
     partial class initialSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,8 +28,14 @@ namespace WebApplication.API.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("AuditBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("EntityState")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("KeyValues")
                         .HasColumnType("nvarchar(max)");

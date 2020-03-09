@@ -17,7 +17,9 @@ namespace WebApplication.API.Migrations
                     DateTime = table.Column<DateTime>(nullable: false),
                     KeyValues = table.Column<string>(nullable: true),
                     OldValues = table.Column<string>(nullable: true),
-                    NewValues = table.Column<string>(nullable: true)
+                    NewValues = table.Column<string>(nullable: true),
+                    EntityState = table.Column<string>(nullable: true),
+                    AuditBy = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
