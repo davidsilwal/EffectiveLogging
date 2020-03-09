@@ -10,13 +10,15 @@ namespace WebApplication.API
 {
     public class Program
     {
-        public static void Main(string[] args) {
+        public static void Main(string[] args)
+        {
             Activity.DefaultIdFormat = ActivityIdFormat.W3C;
 
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) {
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
             return Host.CreateDefaultBuilder(args)
 
                     .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
@@ -24,20 +26,23 @@ namespace WebApplication.API
                     .Enrich.FromLogContext()
                     .WriteTo.Console()
                     .WriteTo.Seq("http://localhost:5341")
-                    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200")) {
+                    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                    {
                         AutoRegisterTemplate = true,
-                        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
+                        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
+                        IndexFormat = "mylogg",
                         CustomFormatter = new ElasticsearchJsonFormatter()
                     }))
-    
+
                     //.UseSerilog((context, logging) =>
                     //{
                     //    logging.WriteTo.Seq("http://localhost:5341/");
                     //    logging.WriteTo.Console();
                     //})
-                    .ConfigureWebHostDefaults(webBuilder => {
+                    .ConfigureWebHostDefaults(webBuilder =>
+                    {
                         webBuilder.UseStartup<Startup>();
                     });
-                            }
-                        }
+        }
+    }
 }
