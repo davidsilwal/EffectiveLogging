@@ -71,7 +71,7 @@ namespace WebApplication.API
             //services.AddMetricsReportingHostedService();
             //    services.AddHoneycomb(Configuration);
 
-services.AddMetrics();
+            services.AddMetrics();
             services.AddControllers(opts =>
             {
                 opts.Filters.Add<SerilogLoggingActionFilter>();
