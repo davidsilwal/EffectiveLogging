@@ -81,6 +81,8 @@ namespace WebApplication.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
+            app.UseDeveloperExceptionPage();
+
         //    app.UseApiExceptionHandler();
 
             app.UseStaticFiles();
