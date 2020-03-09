@@ -50,7 +50,7 @@ services:
     networks:
       logmetric:
   
-  kibana:
+  kibana: 
     image: docker.elastic.co/kibana/kibana:7.6.0
     ports:
       - 5601:5601

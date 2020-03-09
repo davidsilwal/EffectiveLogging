@@ -29,7 +29,7 @@ namespace WebApplication.API
                         AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
                         CustomFormatter = new ElasticsearchJsonFormatter()
                     }))
-
+    
                     //.UseSerilog((context, logging) =>
                     //{
                     //    logging.WriteTo.Seq("http://localhost:5341/");
