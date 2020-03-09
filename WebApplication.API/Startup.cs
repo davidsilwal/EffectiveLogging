@@ -81,14 +81,13 @@ namespace WebApplication.API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 
-            app.UseDeveloperExceptionPage();
-
-        //    app.UseApiExceptionHandler();
+          app.UseApiExceptionHandler();
 
             app.UseStaticFiles();
 
-          //  app.UseSerilogRequestLogging();
+         //   app.UseSerilogRequestLogging();
 
+           app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
