@@ -23,14 +23,12 @@ namespace WebApplication.API
         private readonly RequestDelegate _next;
         private readonly ApiExceptionOptions _options;
 
-        public ApiExceptionMiddleware(ApiExceptionOptions options, RequestDelegate next)
-        {
+        public ApiExceptionMiddleware(ApiExceptionOptions options, RequestDelegate next) {
             _next = next;
             _options = options;
         }
 
-        public async Task Invoke(HttpContext context)
-        {
+        public async Task Invoke(HttpContext context) {
             try
             {
                 await _next(context);
@@ -41,10 +39,8 @@ namespace WebApplication.API
             }
         }
 
-        private Task HandleExceptionAsync(HttpContext context, Exception exception)
-        {
-            var error = new ApiError
-            {
+        private Task HandleExceptionAsync(HttpContext context, Exception exception) {
+            var error = new ApiError {
                 Id = Guid.NewGuid().ToString(),
                 Status = (short)HttpStatusCode.InternalServerError,
                 Title = "Some kind of error occurred in the API.  Please use the id and contact our " +
@@ -67,15 +63,13 @@ namespace WebApplication.API
 
     public static class ApiExceptionMiddlewareExtensions
     {
-        public static IApplicationBuilder UseApiExceptionHandler(this IApplicationBuilder builder)
-        {
+        public static IApplicationBuilder UseApiExceptionHandler(this IApplicationBuilder builder) {
             var options = new ApiExceptionOptions();
             return builder.UseMiddleware<ApiExceptionMiddleware>(options);
         }
 
         public static IApplicationBuilder UseApiExceptionHandler(this IApplicationBuilder builder,
-            Action<ApiExceptionOptions> configureOptions)
-        {
+            Action<ApiExceptionOptions> configureOptions) {
             var options = new ApiExceptionOptions();
             configureOptions(options);
 

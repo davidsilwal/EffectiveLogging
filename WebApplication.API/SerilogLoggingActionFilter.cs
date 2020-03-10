@@ -17,7 +17,7 @@ namespace WebApplication.API
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
-        {
+        {            
             _diagnosticContext.Set("RouteData", context.ActionDescriptor.RouteValues);
             _diagnosticContext.Set("ActionName", context.ActionDescriptor.DisplayName);
             _diagnosticContext.Set("ActionId", context.ActionDescriptor.Id);

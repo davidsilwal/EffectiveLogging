@@ -75,7 +75,6 @@ namespace WebApplication.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
 
-            app.UseAllElasticApm(Configuration);
 
             app.UseApiExceptionHandler();
 
@@ -87,20 +86,18 @@ namespace WebApplication.API
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c => {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            }); 
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
 
             //      app.UseMetricsAllMiddleware();
             //app.UseHoneycomb();
+
+            app.UseAllElasticApm(Configuration);
 
             app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints => {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
 
             //app.Run(async (context) => {
             //    context.Response.Redirect("/swagger");

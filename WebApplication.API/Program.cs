@@ -26,7 +26,9 @@ namespace WebApplication.API
                     .WriteTo.Seq("http://localhost:5341")
                     .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200")) {
                         AutoRegisterTemplate = true,
-                        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
+                        IndexFormat = "logging-api-{0:yyyy.MM.dd}",
+                        NumberOfShards = 1,
+                        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
                         CustomFormatter = new ElasticsearchJsonFormatter()
 
                     }))

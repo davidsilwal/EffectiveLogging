@@ -17,7 +17,7 @@ namespace WebApplication.API
             if (request.QueryString.HasValue)
             {
                 diagnosticContext.Set("QueryString", request.QueryString.Value);
-            }
+            }       
 
             // Set the content-type of the Response at this point
             diagnosticContext.Set("ContentType", httpContext.Response.ContentType);
