@@ -39,11 +39,11 @@ namespace WebApplication.API
         public Dictionary<string, object> NewValues { get; } = new Dictionary<string, object>();
         public List<PropertyEntry> TemporaryProperties { get; } = new List<PropertyEntry>();
 
-        public bool HasTemporaryProperties => TemporaryProperties.Any();
+        public bool HasTemporaryProperties => TemporaryProperties.Count > 0;
 
         public Audit ToAudit()
         {
-            var audit = new Audit
+            return new Audit
             {
                 TableName = TableName,
                 DateTime = DateTime.UtcNow,
@@ -53,7 +53,6 @@ namespace WebApplication.API
                 AuditBy = AuditBy,
                 EntityState = EntityState
             };
-            return audit;
         }
     }
 
@@ -85,11 +84,11 @@ namespace WebApplication.API
         public DbSet<Person> People { get; set; }
         public DbSet<Audit> Audits { get; set; }
 
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
             var auditEntries = OnBeforeSaveChanges();
             var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-            await OnAfterSaveChanges(auditEntries);
+            await OnAfterSaveChanges(auditEntries).ConfigureAwait(false);
             return result;
         }
 
