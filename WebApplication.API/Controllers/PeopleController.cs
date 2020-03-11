@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace WebApplication.API.Controllers
@@ -45,6 +46,15 @@ namespace WebApplication.API.Controllers
         public IActionResult Exception() {
             throw new ArgumentNullException();
         }
+        [HttpGet("trace-request")]
+        public async Task<IActionResult> TryGetDummyEmployeesAsync() {
+            var httpclient = new HttpClient {
+                BaseAddress = new Uri("http://dummy.restapiexample.com")
+            };
+            var result = await httpclient.GetAsync("/api/v1/employees");
+            result.EnsureSuccessStatusCode();
+            return Ok(await result.Content.ReadAsStringAsync());
+        }
 
         [HttpGet("regression")]
         public async Task<IActionResult> regression([FromQuery]int sec) {
@@ -53,7 +63,7 @@ namespace WebApplication.API.Controllers
         }
 
         // GET: api/People
-        [HttpGet]       
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Person>>> GetPeople() {
             return await _context.People.ToListAsync();
         }
