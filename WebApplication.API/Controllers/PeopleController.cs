@@ -46,6 +46,8 @@ namespace WebApplication.API.Controllers
         public IActionResult Exception() {
             throw new ArgumentNullException();
         }
+
+
         [HttpGet("trace-request")]
         public async Task<IActionResult> TryGetDummyEmployeesAsync() {
             var httpclient = new HttpClient {
@@ -55,6 +57,7 @@ namespace WebApplication.API.Controllers
             result.EnsureSuccessStatusCode();
             return Ok(await result.Content.ReadAsStringAsync());
         }
+
 
         [HttpGet("regression")]
         public async Task<IActionResult> regression([FromQuery]int sec) {
