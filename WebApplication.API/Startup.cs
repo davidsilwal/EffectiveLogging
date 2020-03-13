@@ -90,10 +90,8 @@ namespace WebApplication.API
 
           app.UseApiExceptionHandler();
 
-            app.UseStaticFiles();
-
-
-
+          app.UseStaticFiles();
+                       
          //   app.UseSerilogRequestLogging();
 
            app.UseSerilogRequestLogging(opts => opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest);
@@ -114,10 +112,7 @@ namespace WebApplication.API
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
 
         }
     }
