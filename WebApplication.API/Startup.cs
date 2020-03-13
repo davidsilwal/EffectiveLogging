@@ -44,7 +44,7 @@ namespace WebApplication.API
                     s.Endpoint = "http://localhost:5341";
                     s.ApiKey = "WQ1jNI1GgJNMXpJOPAsz";
                 });
-            
+
             services.AddHealthChecksUI();
 
 
@@ -55,9 +55,7 @@ namespace WebApplication.API
                     .UseLoggerFactory(logger)
                     .EnableDetailedErrors()
                     .EnableSensitiveDataLogging()
-                    .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;",
-                     sql => sql.MigrationsAssembly(typeof(Startup).Assembly.FullName));
-
+                    .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;", sql => sql.MigrationsAssembly(typeof(Startup).Assembly.FullName));
             });
 
             //services.AddOpenTelemetry(builder => {
@@ -88,9 +86,7 @@ namespace WebApplication.API
             });
 
             // Register the Swagger generator, defining 1 or more Swagger documents
-            var serviceCollection = services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-            });
+            var serviceCollection = services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,9 +106,7 @@ namespace WebApplication.API
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c => {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
 
             //      app.UseMetricsAllMiddleware();
             //app.UseHoneycomb();
