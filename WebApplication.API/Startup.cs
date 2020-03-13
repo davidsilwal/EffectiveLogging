@@ -1,11 +1,15 @@
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Serilog;
+using System;
+using System.Threading.Tasks;
 
 namespace WebApplication.API
 {
@@ -28,9 +32,19 @@ namespace WebApplication.API
             //        .UseLoggerFactory(MyLoggerFactory)
             //        .UseInMemoryDatabase("testdb"));
 
-                     
-            services.AddDbContextPool<ApplicationDbContext>((provider, options) =>
-            {
+            services.AddHealthChecks()
+                .AddCheck("self", () => HealthCheckResult.Healthy())
+                .AddUrlGroup(new Uri("https://www.facebook.com/"), "Facebook", tags: new[] { "ready" })
+                .AddSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;",
+                                                        healthQuery: "SELECT 1;",
+                                                        name: "sql",
+                                                        failureStatus: HealthStatus.Degraded)
+                .AddDbContextCheck<ApplicationDbContext>();
+
+            services.AddHealthChecksUI();
+
+
+            services.AddDbContextPool<ApplicationDbContext>((provider, options) => {    
                 var logger = provider.GetRequiredService<ILoggerFactory>();
 
                 options
@@ -65,14 +79,12 @@ namespace WebApplication.API
             //services.AddMetricsReportingHostedService();
             //    services.AddHoneycomb(Configuration);
 
-            services.AddControllers(opts =>
-            {
+            services.AddControllers(opts => {
                 opts.Filters.Add<SerilogLoggingActionFilter>();
             });
 
             // Register the Swagger generator, defining 1 or more Swagger documents
-            var serviceCollection = services.AddSwaggerGen(c =>
-            {
+            var serviceCollection = services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
         }
@@ -83,19 +95,18 @@ namespace WebApplication.API
 
             app.UseDeveloperExceptionPage();
 
-        //    app.UseApiExceptionHandler();
+            //    app.UseApiExceptionHandler();
 
             app.UseStaticFiles();
 
-          //  app.UseSerilogRequestLogging();
+            //  app.UseSerilogRequestLogging();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
+            app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
@@ -104,11 +115,17 @@ namespace WebApplication.API
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
+            app.UseHealthChecks("/health", new HealthCheckOptions() {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 
+            app.UseHealthChecksUI(o => o.UIPath = "/healthchecks-ui");
+
+
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
+
+            app.Run(ctx => { ctx.Response.Redirect("/swagger"); return Task.CompletedTask; });
         }
     }
 }
