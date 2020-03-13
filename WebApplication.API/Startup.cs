@@ -39,12 +39,16 @@ namespace WebApplication.API
                                                         healthQuery: "SELECT 1;",
                                                         name: "sql",
                                                         failureStatus: HealthStatus.Degraded)
-                .AddDbContextCheck<ApplicationDbContext>();
-
+                .AddDbContextCheck<ApplicationDbContext>()
+                .AddSeqPublisher(s => {
+                    s.Endpoint = "http://localhost:5341";
+                    s.ApiKey = "WQ1jNI1GgJNMXpJOPAsz";
+                });
+            
             services.AddHealthChecksUI();
 
 
-            services.AddDbContextPool<ApplicationDbContext>((provider, options) => {    
+            services.AddDbContextPool<ApplicationDbContext>((provider, options) => {
                 var logger = provider.GetRequiredService<ILoggerFactory>();
 
                 options
