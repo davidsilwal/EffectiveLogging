@@ -17,9 +17,8 @@ namespace WebApplication.API
         public string KeyValues { get; set; }
         public string OldValues { get; set; }
         public string NewValues { get; set; }
-        public string EntityState { get; set; }
-        public string AuditBy { get; set; }
     }
+
 
     public class AuditEntry
     {
@@ -30,10 +29,6 @@ namespace WebApplication.API
 
         public EntityEntry Entry { get; }
         public string TableName { get; set; }
-
-        public string AuditBy { get; set; }
-        public string EntityState { get; set; }
-
         public Dictionary<string, object> KeyValues { get; } = new Dictionary<string, object>();
         public Dictionary<string, object> OldValues { get; } = new Dictionary<string, object>();
         public Dictionary<string, object> NewValues { get; } = new Dictionary<string, object>();
@@ -43,15 +38,12 @@ namespace WebApplication.API
 
         public Audit ToAudit()
         {
-            var audit = new Audit
-            {
+            var audit = new Audit {
                 TableName = TableName,
                 DateTime = DateTime.UtcNow,
                 KeyValues = JsonSerializer.Serialize(KeyValues),
                 OldValues = OldValues.Count == 0 ? null : JsonSerializer.Serialize(OldValues),
-                NewValues = NewValues.Count == 0 ? null : JsonSerializer.Serialize(NewValues),
-                AuditBy = AuditBy,
-                EntityState = EntityState
+                NewValues = NewValues.Count == 0 ? null : JsonSerializer.Serialize(NewValues)
             };
             return audit;
         }
@@ -93,7 +85,6 @@ namespace WebApplication.API
             return result;
         }
 
-
         private List<AuditEntry> OnBeforeSaveChanges()
         {
             ChangeTracker.DetectChanges();
@@ -103,13 +94,9 @@ namespace WebApplication.API
                 if (entry.Entity is Audit || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
                     continue;
 
-                var auditEntry = new AuditEntry(entry)
-                {
-                    TableName = entry.Metadata.GetDefaultTableName(),
-                    //  AuditBy = _httpContextAccessor.HttpContext.User.ToString(),
-                    EntityState = entry.State.ToString()
+                var auditEntry = new AuditEntry(entry) {
+                    TableName = entry.Metadata.GetTableName()
                 };
-                //  auditEntry.TableName = entry.Metadata.Relational().TableName;
                 auditEntries.Add(auditEntry);
 
                 foreach (var property in entry.Properties)
@@ -130,21 +117,21 @@ namespace WebApplication.API
 
                     switch (entry.State)
                     {
-                        case EntityState.Added:
-                            auditEntry.NewValues[propertyName] = property.CurrentValue;
-                            break;
+                    case EntityState.Added:
+                        auditEntry.NewValues[propertyName] = property.CurrentValue;
+                        break;
 
-                        case EntityState.Deleted:
+                    case EntityState.Deleted:
+                        auditEntry.OldValues[propertyName] = property.OriginalValue;
+                        break;
+
+                    case EntityState.Modified:
+                        if (property.IsModified)
+                        {
                             auditEntry.OldValues[propertyName] = property.OriginalValue;
-                            break;
-
-                        case EntityState.Modified:
-                            if (property.IsModified)
-                            {
-                                auditEntry.OldValues[propertyName] = property.OriginalValue;
-                                auditEntry.NewValues[propertyName] = property.CurrentValue;
-                            }
-                            break;
+                            auditEntry.NewValues[propertyName] = property.CurrentValue;
+                        }
+                        break;
                     }
                 }
             }
@@ -163,7 +150,6 @@ namespace WebApplication.API
         {
             if (auditEntries == null || auditEntries.Count == 0)
                 return Task.CompletedTask;
-
 
             foreach (var auditEntry in auditEntries)
             {
@@ -188,3 +174,4 @@ namespace WebApplication.API
         }
     }
 }
+
