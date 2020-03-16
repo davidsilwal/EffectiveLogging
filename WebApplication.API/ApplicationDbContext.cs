@@ -84,16 +84,16 @@ namespace WebApplication.API
         public DbSet<Person> People { get; set; }
         public DbSet<Audit> Audits { get; set; }
 
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
-            var auditEntries = OnBeforeSaveChanges();
+            var auditEntries = await OnBeforeSaveChanges();
             var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
             await OnAfterSaveChanges(auditEntries);
             return result;
         }
 
 
-        private List<AuditEntry> OnBeforeSaveChanges()
+        private async ValueTask<List<AuditEntry>> OnBeforeSaveChanges()
         {
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
@@ -109,6 +109,7 @@ namespace WebApplication.API
                 };
                 //  auditEntry.TableName = entry.Metadata.Relational().TableName;
                 auditEntries.Add(auditEntry);
+
 
                 foreach (var property in entry.Properties)
                 {
@@ -139,8 +140,7 @@ namespace WebApplication.API
                     case EntityState.Modified:
                         if (property.IsModified)
                         {
-                            auditEntry.OldValues[propertyName] = property.EntityEntry.GetDatabaseValues().GetValue<object>(propertyName);
-                            //  auditEntry.OldValues[propertyName] = property.OriginalValue;
+                            auditEntry.OldValues[propertyName] = (await property.EntityEntry.GetDatabaseValuesAsync()).GetValue<object>(propertyName);
                             auditEntry.NewValues[propertyName] = property.CurrentValue;
                         }
                         break;
@@ -170,13 +170,9 @@ namespace WebApplication.API
                 foreach (var prop in auditEntry.TemporaryProperties)
                 {
                     if (prop.Metadata.IsPrimaryKey())
-                    {
                         auditEntry.KeyValues[prop.Metadata.Name] = prop.CurrentValue;
-                    }
                     else
-                    {
                         auditEntry.NewValues[prop.Metadata.Name] = prop.CurrentValue;
-                    }
                 }
 
                 // Save the Audit entry
