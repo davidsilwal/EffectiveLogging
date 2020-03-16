@@ -43,8 +43,7 @@ namespace WebApplication.API
 
         public Audit ToAudit()
         {
-            var audit = new Audit
-            {
+            var audit = new Audit {
                 TableName = TableName,
                 DateTime = DateTime.UtcNow,
                 KeyValues = JsonSerializer.Serialize(KeyValues),
@@ -103,8 +102,7 @@ namespace WebApplication.API
                 if (entry.Entity is Audit || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
                     continue;
 
-                var auditEntry = new AuditEntry(entry)
-                {
+                var auditEntry = new AuditEntry(entry) {
                     TableName = entry.Metadata.GetDefaultTableName(),
                     //  AuditBy = _httpContextAccessor.HttpContext.User.ToString(),
                     EntityState = entry.State.ToString()
@@ -130,21 +128,22 @@ namespace WebApplication.API
 
                     switch (entry.State)
                     {
-                        case EntityState.Added:
+                    case EntityState.Added:
+                        auditEntry.NewValues[propertyName] = property.CurrentValue;
+                        break;
+
+                    case EntityState.Deleted:
+                        auditEntry.OldValues[propertyName] = property.OriginalValue;
+                        break;
+
+                    case EntityState.Modified:
+                        if (property.IsModified)
+                        {
+                            auditEntry.OldValues[propertyName] = property.EntityEntry.GetDatabaseValues().GetValue<object>(propertyName);
+                            //  auditEntry.OldValues[propertyName] = property.OriginalValue;
                             auditEntry.NewValues[propertyName] = property.CurrentValue;
-                            break;
-
-                        case EntityState.Deleted:
-                            auditEntry.OldValues[propertyName] = property.OriginalValue;
-                            break;
-
-                        case EntityState.Modified:
-                            if (property.IsModified)
-                            {
-                                auditEntry.OldValues[propertyName] = property.OriginalValue;
-                                auditEntry.NewValues[propertyName] = property.CurrentValue;
-                            }
-                            break;
+                        }
+                        break;
                     }
                 }
             }

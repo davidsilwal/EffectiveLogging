@@ -10,7 +10,7 @@ using WebApplication.API;
 namespace WebApplication.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200303144642_initialSchema")]
+    [Migration("20200316034830_initialSchema")]
     partial class initialSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
