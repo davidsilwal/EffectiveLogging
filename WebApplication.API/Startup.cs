@@ -1,11 +1,9 @@
+using DataAccessLayer.EFCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Serilog;
 
 namespace WebApplication.API
 {
@@ -28,19 +26,21 @@ namespace WebApplication.API
             //        .UseLoggerFactory(MyLoggerFactory)
             //        .UseInMemoryDatabase("testdb"));
 
-                     
-            services.AddDbContextPool<ApplicationDbContext>((provider, options) =>
-            {
-                var logger = provider.GetRequiredService<ILoggerFactory>();
 
-                options
-                    .UseLoggerFactory(logger)
-                    .EnableDetailedErrors()
-                    .EnableSensitiveDataLogging()
-                    .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;",
-                     sql => sql.MigrationsAssembly(typeof(Startup).Assembly.FullName));
+            services.AddDbContext<ApplicationDbContext>();
 
-            });
+            //services.AddDbContextPool<ApplicationDbContext>((provider, options) =>
+            //{
+            //    var logger = provider.GetRequiredService<ILoggerFactory>();
+
+            //    options
+            //        .UseLoggerFactory(logger)
+            //        .EnableDetailedErrors()
+            //        .EnableSensitiveDataLogging()
+            //        .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyLogging;Trusted_Connection=True;",
+            //         sql => sql.MigrationsAssembly(typeof(Startup).Assembly.FullName));
+
+            //});
 
             //services.AddOpenTelemetry(builder => {
             //    builder.UseZipkin(o => {
@@ -83,11 +83,11 @@ namespace WebApplication.API
 
             app.UseDeveloperExceptionPage();
 
-        //    app.UseApiExceptionHandler();
+            //    app.UseApiExceptionHandler();
 
             app.UseStaticFiles();
 
-          //  app.UseSerilogRequestLogging();
+            //  app.UseSerilogRequestLogging();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

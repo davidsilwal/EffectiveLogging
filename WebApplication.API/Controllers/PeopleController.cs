@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DataAccessLayer.EFCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,7 +28,8 @@ namespace WebApplication.API.Controllers
         public PeopleController(ApplicationDbContext context,
             ILogger<PeopleController> logger
         //    IMetrics metrics
-            ) {
+            )
+        {
             _context = context;
             _logger = logger;
             //      _metrics = metrics;
@@ -42,25 +44,29 @@ namespace WebApplication.API.Controllers
         //}
 
         [HttpGet("exception")]
-        public IActionResult Exception() {
+        public IActionResult Exception()
+        {
             throw new ArgumentNullException();
         }
 
         [HttpGet("regression")]
-        public async Task<IActionResult> regression([FromQuery]int sec) {
+        public async Task<IActionResult> regression([FromQuery]int sec)
+        {
             await Task.Delay(TimeSpan.FromSeconds(sec));
             return Ok();
         }
 
         // GET: api/People
-        [HttpGet]       
-        public async Task<ActionResult<IEnumerable<Person>>> GetPeople() {
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Person>>> GetPeople()
+        {
             return await _context.People.ToListAsync();
         }
 
         // GET: api/People/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Person>> GetPerson(int id) {
+        public async Task<ActionResult<Person>> GetPerson(int id)
+        {
             var person = await _context.People.FindAsync(id);
 
             if (person == null)
@@ -75,7 +81,8 @@ namespace WebApplication.API.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPerson(int id, Person person) {
+        public async Task<IActionResult> PutPerson(int id, Person person)
+        {
             if (id != person.Id)
             {
                 return BadRequest();
@@ -106,7 +113,8 @@ namespace WebApplication.API.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Person>> PostPerson(Person person) {
+        public async Task<ActionResult<Person>> PostPerson(Person person)
+        {
             _context.People.Add(person);
             await _context.SaveChangesAsync();
 
@@ -115,7 +123,8 @@ namespace WebApplication.API.Controllers
 
         // DELETE: api/People/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Person>> DeletePerson(int id) {
+        public async Task<ActionResult<Person>> DeletePerson(int id)
+        {
             var person = await _context.People.FindAsync(id);
             if (person == null)
             {
@@ -128,7 +137,8 @@ namespace WebApplication.API.Controllers
             return person;
         }
 
-        private bool PersonExists(int id) {
+        private bool PersonExists(int id)
+        {
             return _context.People.Any(e => e.Id == id);
         }
     }

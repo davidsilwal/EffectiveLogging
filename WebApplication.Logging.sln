@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication.API", "WebAp
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{94E4BDDE-F5D5-4268-8F1E-19456261A1C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer.EFCore", "..\DataAccessLayer.EFCore\DataAccessLayer.EFCore.csproj", "{ED742C82-74C5-4855-A796-FD1E56AC51EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer.EFCore.Benchmark", "..\DataAccessLayer.EFCore.Benchmark\DataAccessLayer.EFCore.Benchmark.csproj", "{C941FFB3-B719-42A1-AF5F-3D89A5EC9044}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{94E4BDDE-F5D5-4268-8F1E-19456261A1C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94E4BDDE-F5D5-4268-8F1E-19456261A1C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94E4BDDE-F5D5-4268-8F1E-19456261A1C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED742C82-74C5-4855-A796-FD1E56AC51EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED742C82-74C5-4855-A796-FD1E56AC51EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED742C82-74C5-4855-A796-FD1E56AC51EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED742C82-74C5-4855-A796-FD1E56AC51EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C941FFB3-B719-42A1-AF5F-3D89A5EC9044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C941FFB3-B719-42A1-AF5F-3D89A5EC9044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C941FFB3-B719-42A1-AF5F-3D89A5EC9044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C941FFB3-B719-42A1-AF5F-3D89A5EC9044}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
